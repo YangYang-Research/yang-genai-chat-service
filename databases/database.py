@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from helpers.config import DatabaseConfig
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from helpers.secret import AWSSecretManager
+from contextlib import asynccontextmanager
 
 db_conf = DatabaseConfig()
 aws_secret_manager = AWSSecretManager()

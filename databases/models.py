@@ -7,6 +7,7 @@ class LLMModel(Base):
     __tablename__ = "llms"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    
     name = Column(String(100), nullable=False, unique=True)
 
     # AWS Region
@@ -24,6 +25,9 @@ class LLMModel(Base):
     # System prompt
     system_prompt = Column(Text, nullable=True)
 
+    status = Column(String(16), default="enable")
+    trashed = Column(Boolean, default=False)
+
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -34,6 +38,7 @@ class AgentModel(Base):
     __tablename__ = "agents"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+
     name = Column(String(100), nullable=False, unique=True)
 
     # Knowledge Base
@@ -48,6 +53,9 @@ class AgentModel(Base):
     # List tools
     tools = Column(JSON, nullable=True)
 
+    status = Column(String(16), default="enable")
+    trashed = Column(Boolean, default=False)
+    
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -61,7 +69,8 @@ class ToolModel(Base):
     
     # Tool identification
     name = Column(String(64), nullable=False, unique=True)  # e.g., "duckduckgo", "arxiv"
-    status = Column(String(16), default="disable")           # "enable" or "disable"
+    status = Column(String(16), default="disable") # "enable" or "disable"
+    trashed = Column(Boolean, default=False) 
     
     # Optional authentication / API credentials
     host = Column(String(255), nullable=True)
@@ -79,22 +88,36 @@ class RoleModel(Base):
     __tablename__ = "roles"
 
     id = Column(Integer, primary_key=True, index=True)
+
     name = Column(String(50), unique=True, nullable=False)
     description = Column(String(255), nullable=True)
+
+    status = Column(String(16), default="enable")
+    trashed = Column(Boolean, default=False)
+
+    # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # One-to-many relationship — A role can have many users
     users = relationship("UserModel", back_populates="roles")
 
 class UserModel(Base):
     __tablename__ = "users"
+
     id = Column(Integer, primary_key=True, index=True)
+
     username = Column(String(50), unique=True, nullable=False)
     email = Column(String(255), unique=True, nullable=False, index=True)
     hashed_password = Column(String(255), nullable=False)
     full_name = Column(String(100), nullable=True)
     changed_password = Column(Boolean, default=False)
-    role_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
+    role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
+
+    active_status = Column(String(16), default="enable")
+    trashed = Column(Boolean, default=False)
+
+    # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -103,10 +126,15 @@ class UserModel(Base):
 
 class MessageModel(Base):
     __tablename__ = "messages"
+
     id = Column(Integer, primary_key=True, index=True)
+
     user_id = Column(Integer, ForeignKey("users.id"))
     role = Column(String(10))  # "user" or "assistant"
     content = Column(Text)
+    feedback = Column(Boolean, nullable=True)
+    status = Column(String(16), default="enable")
+    trashed = Column(Boolean, default=False)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
 
     users = relationship("UserModel", back_populates="messages")

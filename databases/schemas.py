@@ -5,9 +5,14 @@ from datetime import datetime
 # ------------------- User Schemas -------------------
 
 class UserBase(BaseModel):
+    id: int
     username: str
     email: EmailStr
     full_name: Optional[str] = None
+    changed_password: bool
+    active_status: str
+    trashed: bool
+    role_id: int
 
 class UserCreate(UserBase):
     password: str
@@ -17,6 +22,8 @@ class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     full_name: Optional[str] = None
     password: Optional[str] = None
+    active_status: str
+    trashed: bool
 
 class UserRead(UserBase):
     id: int
@@ -35,6 +42,9 @@ class UserOut(UserBase):
 class MessageBase(BaseModel):
     role: str
     content: str
+    feedback: Optional[bool] = None
+    status: str
+    trashed: bool
 
 class MessageCreate(MessageBase):
     user_id: int
@@ -59,6 +69,7 @@ class MessageOut(MessageBase):
 class ToolBase(BaseModel):
     name: str
     status: str
+    trashed: bool
     host: Optional[str] = None
     api_key: Optional[str] = None
     cse_id: Optional[str] = None
@@ -72,6 +83,7 @@ class ToolCreate(ToolBase):
 class ToolUpdate(BaseModel):
     name: Optional[str] = None
     status: Optional[str] = None
+    trashed: Optional[bool] = None
     host: Optional[str] = None
     api_key: Optional[str] = None
     cse_id: Optional[str] = None
@@ -95,21 +107,24 @@ class ToolOut(ToolBase):
 
 class LLMBase(BaseModel):
     name: str
-    provider: str
+    region: str
     model_id: str
-    api_key: Optional[str] = None
-    base_url: Optional[str] = None
+    model_max_tokens: str
+    model_temperature: str
+    guardrail_id: Optional[str] = None
+    guardrail_version: Optional[str] = None
+    system_prompt: str
     status: str
+    trashed: bool
 
 class LLMCreate(LLMBase):
     pass
 
 class LLMUpdate(BaseModel):
     name: Optional[str] = None
-    provider: Optional[str] = None
+    status: Optional[str] = None
+    trashed: Optional[bool] = None
     model_id: Optional[str] = None
-    api_key: Optional[str] = None
-    base_url: Optional[str] = None
     status: Optional[str] = None
 
 class LLMRead(LLMBase):
@@ -128,6 +143,8 @@ class LLMOut(LLMBase):
 
 class AgentBase(BaseModel):
     name: str
+    status: str
+    trashed: bool
     knowledge_base_id: Optional[str] = None
     llm_id: int
     system_prompt: Optional[str] = None
@@ -138,6 +155,8 @@ class AgentCreate(AgentBase):
 
 class AgentUpdate(BaseModel):
     name: Optional[str] = None
+    status: Optional[str] = None
+    trashed: Optional[bool] = None
     knowledge_base_id: Optional[str] = None
     llm_id: Optional[int] = None
     system_prompt: Optional[str] = None
