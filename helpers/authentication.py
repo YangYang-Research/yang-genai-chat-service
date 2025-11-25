@@ -53,7 +53,7 @@ async def verify_yang_auth_token(
     x_yang_auth: str = Header(None, alias="x-yang-auth")
 ):
     """
-    Validate Yang JWT token via the 'x-yang-auth' header.
+    Validate Yang Bacsic authentication via the 'x-yang-auth' header.
     Raises HTTPException on failure.
     """
 
@@ -78,7 +78,7 @@ async def verify_yang_auth_token(
         )
     
     # Load secret from AWS Secrets Manager
-    api_credential = aws_secret_manager.get_secret(app_conf.app_auth_key)
+    api_credential = aws_secret_manager.get_secret(app_conf.api_auth_key_name)
 
     if credential != api_credential:
         raise HTTPException(

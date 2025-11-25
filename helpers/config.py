@@ -13,7 +13,7 @@ class AppConfig(object):
     app_version: str = os.getenv("APP_VERSION", "0.0.0")
     api_version_web: str = "v1"
     api_version_mobile: str = "v2"
-    app_auth_key: str = os.getenv("APP_AUTH_KEY", "")
+    api_auth_key_name: str = os.getenv("API_AUTH_KEY_NAME", "")
     app_jwt_secret_key: str = os.getenv("APP_JWT_SECRET_KEY", "")
     app_admin_email: str =  os.getenv("APP_ADMIN_EMAIL", "administrator@yang.app")
 

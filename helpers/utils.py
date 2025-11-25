@@ -66,11 +66,3 @@ class Utils:
                 })
                 
         return formatted
-
-    def check_api_authentication(authorization_header):
-        credential = authorization_header.split(" ")[1]
-        
-        api_credential = aws_secret_manager.get_secret(app_conf.api_auth_key)
-        if credential != api_credential:
-            return False
-        return True

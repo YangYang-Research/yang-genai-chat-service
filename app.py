@@ -1,6 +1,6 @@
 import uvicorn
 import traceback
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from helpers.utils import Utils
 from databases.base import Base
 from helpers.loog import logger
@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from helpers.datamodel import ChatAgentRequest, ChatLLMRequest
 from fastapi.responses import StreamingResponse, JSONResponse
 from databases.database import engine, create_database_if_not_exists
+from helpers.authentication import verify_yang_auth_token, verify_user_admin_auth_token
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from databases.seeds import seed_initial_data
 
@@ -79,7 +80,7 @@ app.include_router(agent_router)
 def health():
     return {"status": "ok"}
 
-@app.post(f"/{app_conf.api_version_web}/chat/agent/completions")
+@app.post(f"/{app_conf.api_version_web}/chat/agent/completions", dependencies=[Depends(verify_yang_auth_token)])
 async def chat_agent_completions(req: ChatAgentRequest, http_req: Request):
     try:
         authorization_header = http_req.headers.get("Authorization")
@@ -109,7 +110,7 @@ async def chat_agent_completions(req: ChatAgentRequest, http_req: Request):
             content={"error": str(e)}
         )
 
-@app.post(f"/{app_conf.api_version_web}/chat/llm/completions")
+@app.post(f"/{app_conf.api_version_web}/chat/llm/completions", dependencies=[Depends(verify_yang_auth_token)])
 async def chat_llm_completions(req: ChatLLMRequest, http_req: Request):
     try:
         authorization_header = http_req.headers.get("Authorization")
