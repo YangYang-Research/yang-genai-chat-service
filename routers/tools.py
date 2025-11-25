@@ -7,8 +7,11 @@ from databases.crud import (
 )
 from databases.database import get_db
 from helpers.authentication import verify_yang_auth_token, verify_user_admin_auth_token
+from helpers.config import AppConfig
 
-router = APIRouter(prefix="/tools", tags=["Tools"])
+app_conf = AppConfig()
+
+router = APIRouter(prefix=f"/{app_conf.api_version_web}/tools", tags=["Tools"])
 
 
 @router.post("/", dependencies=[Depends(verify_yang_auth_token)], response_model=ToolOut)

@@ -79,7 +79,7 @@ app.include_router(agent_router)
 def health():
     return {"status": "ok"}
 
-@app.post(f"/{app_conf.api_ver_1}/chat/agent/completions")
+@app.post(f"/{app_conf.api_version_web}/chat/agent/completions")
 async def chat_agent_completions(req: ChatAgentRequest, http_req: Request):
     try:
         authorization_header = http_req.headers.get("Authorization")
@@ -109,7 +109,7 @@ async def chat_agent_completions(req: ChatAgentRequest, http_req: Request):
             content={"error": str(e)}
         )
 
-@app.post(f"/{app_conf.api_ver_1}/chat/llm/completions")
+@app.post(f"/{app_conf.api_version_web}/chat/llm/completions")
 async def chat_llm_completions(req: ChatLLMRequest, http_req: Request):
     try:
         authorization_header = http_req.headers.get("Authorization")

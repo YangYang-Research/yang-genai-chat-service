@@ -11,7 +11,8 @@ class AppConfig(object):
     
     app_name: str = os.getenv("APP_NAME", "Yang GenAI Chat Service")
     app_version: str = os.getenv("APP_VERSION", "0.0.0")
-    api_ver_1: str = "v1"
+    api_version_web: str = "v1"
+    api_version_mobile: str = "v2"
     app_auth_key: str = os.getenv("APP_AUTH_KEY", "")
     app_jwt_secret_key: str = os.getenv("APP_JWT_SECRET_KEY", "")
     app_admin_email: str =  os.getenv("APP_ADMIN_EMAIL", "administrator@yang.app")
