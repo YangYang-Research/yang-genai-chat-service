@@ -1,6 +1,7 @@
 # crud.py
 from typing import List, Optional
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 from databases import models, schemas
 
@@ -26,6 +27,11 @@ async def get_user(db: AsyncSession, user_id: int):
     )
     return result.scalars().first()
 
+async def get_user_by_username(db: AsyncSession, username: str):
+    result = await db.execute(
+        select(models.UserModel).options(joinedload(models.UserModel.roles)).where(models.UserModel.username == username)
+    )
+    return result.scalars().first()
 
 async def update_user(db: AsyncSession, user_id: int, data: schemas.UserUpdate):
     result = await db.execute(

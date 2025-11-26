@@ -2,9 +2,11 @@ import jwt
 from fastapi import Header, HTTPException, status
 from helpers.secret import AWSSecretManager
 from helpers.config import AppConfig
+from passlib.context import CryptContext
 
 app_conf = AppConfig()
 aws_secret_manager = AWSSecretManager()
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 async def verify_user_admin_auth_token(authorization: str = Header(None)):
     """
@@ -88,4 +90,15 @@ async def verify_yang_auth_token(
 
     return True
 
-    
+def verify_user_password(plain, hashed):
+    return pwd_context.verify(plain, hashed)
+
+def create_jwt_token(payload: dict, expires_delta: int = None):
+    to_encode = payload.copy()
+    jwt_secret = aws_secret_manager.get_secret(app_conf.app_jwt_secret_key)
+
+    if expires_delta:
+        to_encode.update({"exp": expires_delta})
+
+    encoded_jwt = jwt.encode(to_encode, jwt_secret, algorithm="HS256")
+    return encoded_jwt

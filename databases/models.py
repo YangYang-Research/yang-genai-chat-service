@@ -110,7 +110,7 @@ class UserModel(Base):
     username = Column(String(50), unique=True, nullable=False)
     email = Column(String(255), unique=True, nullable=False, index=True)
     hashed_password = Column(String(255), nullable=False)
-    full_name = Column(String(100), nullable=True)
+    fullname = Column(String(100), nullable=True)
     changed_password = Column(Boolean, default=False)
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
 

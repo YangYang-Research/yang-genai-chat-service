@@ -42,7 +42,7 @@ async def seed_admin(session):
         username="administrator",
         email=app_conf.app_admin_email,
         hashed_password=pwd_context.hash(init_admin_password),
-        full_name="Administrator",
+        fullname="Administrator",
         role_id=admin_role.id
     )
 

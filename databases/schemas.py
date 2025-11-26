@@ -8,20 +8,20 @@ class UserBase(BaseModel):
     id: int
     username: str
     email: EmailStr
-    full_name: Optional[str] = None
+    fullname: Optional[str] = None
     changed_password: bool
     active_status: str
     trashed: bool
     role_id: int
 
 class UserCreate(UserBase):
-    password: str
+    hashed_password: str
 
 class UserUpdate(BaseModel):
     username: Optional[str] = None
     email: Optional[EmailStr] = None
-    full_name: Optional[str] = None
-    password: Optional[str] = None
+    fullname: Optional[str] = None
+    hashed_password: Optional[str] = None
     active_status: str
     trashed: bool
 
@@ -36,7 +36,7 @@ class UserOut(UserBase):
     id: int
 
     model_config = {"from_attributes": True}
-    
+
 # ------------------- Message Schemas -------------------
 
 class MessageBase(BaseModel):

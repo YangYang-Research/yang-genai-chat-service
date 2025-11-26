@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from databases.schemas import UserCreate, UserUpdate, UserOut
 from databases.crud import (
-    create_user, get_users, get_user, update_user, delete_user
+    create_user, get_users, get_user, get_user_by_username, update_user, delete_user
 )
 from databases.database import get_db
 from helpers.authentication import verify_yang_auth_token, verify_user_admin_auth_token
