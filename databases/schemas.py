@@ -68,7 +68,11 @@ class MessageOut(MessageBase):
 
 class ToolBase(BaseModel):
     name: str
+    display_name: str
     status: str
+    logo: Optional[str] = None
+    description: Optional[str] = None
+    tags: Optional[List[str]] = None
     trashed: bool
     host: Optional[str] = None
     api_key: Optional[str] = None
@@ -82,6 +86,10 @@ class ToolCreate(ToolBase):
 
 class ToolUpdate(BaseModel):
     name: Optional[str] = None
+    display_name: Optional[str] = None
+    logo: Optional[str] = None
+    description: Optional[str] = None
+    tags: Optional[List[str]] = None
     status: Optional[str] = None
     trashed: Optional[bool] = None
     host: Optional[str] = None

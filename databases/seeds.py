@@ -16,8 +16,9 @@ async def seed_role(session):
 
     if not existing_roles:
         roles = [
-            RoleModel(name="admin", description="Administrator with full access"),
-            RoleModel(name="user", description="Standard user with limited permissions"),
+            RoleModel(name="administrator", description="Administrator with full access"),
+            RoleModel(name="maintainer", description="Maintainer role with elevated permissions"),
+            RoleModel(name="enduser", description="Standard user with limited permissions"),
         ]
         session.add_all(roles)
         await session.commit()
@@ -53,16 +54,16 @@ async def seed_admin(session):
 
 async def seed_tool(session):
     tools = [
-        {"name": "duckduckgo", "status": "enable"},
-        {"name": "arxiv", "status": "enable"},
-        {"name": "wikipedia", "status": "enable"},
-        {"name": "google_search", "status": "disable"},
-        {"name": "google_scholar", "status": "disable"},
-        {"name": "google_trend", "status": "disable"},
-        {"name": "asknews", "status": "disable"},
-        {"name": "reddit", "status": "disable"},
-        {"name": "searx", "status": "disable"},
-        {"name": "openweather", "status": "disable"},
+        {"name": "duckduckgo", "display_name": "DuckDuckGo", "status": "enable", "logo": "🦆", "description": "Privacy-focused general-purpose web search.", "tags": ["Search", "Web", "Private"]},
+        {"name": "arxiv", "display_name": "Arxiv", "status": "enable", "logo": "📚", "description": "Search academic papers and preprints from arXiv.", "tags": ["Research", "Academic"]},
+        {"name": "wikipedia", "display_name": "Wikipedia", "status": "enable", "logo": "📖", "description": "Retrieve general knowledge, summaries, and definitions.", "tags": ["Knowledge", "Reference"]},
+        {"name": "google_search", "display_name": "GoogleSearch", "status": "disable", "logo": "🌐", "description": "Comprehensive Google-powered web search.", "tags": ["Search", "Web", "Public"]},
+        {"name": "google_scholar", "display_name": "GoogleScholar", "status": "disable", "logo": "🎓", "description": "Search scholarly publications and citations.", "tags": ["Research", "Academic"]},
+        {"name": "google_trend", "display_name": "GoogleTrends", "status": "disable", "logo": "📈", "description": "Analyze trending search queries and interest over time.", "tags": ["Analytics", "Search"]},
+        {"name": "asknews", "display_name": "AskNews", "status": "disable", "logo": "🗞️", "description": "Fetch the latest breaking news from various sources.", "tags": ["News", "Trending"]},
+        {"name": "reddit", "display_name": "RedditSearch", "status": "disable", "logo": "💬", "description": "Find community discussions and opinions from Reddit.", "tags": ["Community", "Social"]},
+        {"name": "searx", "display_name": "SearxSearch", "status": "disable", "logo": "🕸️", "description": "Meta search engine combining results from multiple sources.", "tags": ["Search", "Meta"]},
+        {"name": "openweather", "display_name": "OpenWeather", "status": "disable", "logo": "⛅", "description": "Check current and forecasted weather conditions.", "tags": ["Utility", "Environment"]},
     ]
 
     for t in tools:

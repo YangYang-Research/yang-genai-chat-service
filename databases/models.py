@@ -69,7 +69,11 @@ class ToolModel(Base):
     
     # Tool identification
     name = Column(String(64), nullable=False, unique=True)  # e.g., "duckduckgo", "arxiv"
+    display_name = Column(String(100), nullable=True)  # e.g., "DuckDuckGo Search"
     status = Column(String(16), default="disable") # "enable" or "disable"
+    logo = Column(String(255), nullable=True)
+    description = Column(Text, nullable=True)
+    tags = Column(JSON, nullable=True)  # e.g., ["search", "knowledge"]
     trashed = Column(Boolean, default=False) 
     
     # Optional authentication / API credentials
