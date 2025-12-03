@@ -1,18 +1,13 @@
 import uvicorn
 import traceback
-from fastapi import FastAPI, Request, Depends
-from helpers.utils import Utils
-from databases.base import Base
+from fastapi import FastAPI
 from helpers.loog import logger
 from bedrock.stream import Streaming
 import databases.models as db_models
 from contextlib import asynccontextmanager
 from helpers.config import AppConfig, AWSConfig, DatabaseConfig
 from fastapi.middleware.cors import CORSMiddleware
-from helpers.datamodel import ChatAgentRequest, ChatLLMRequest
-from fastapi.responses import StreamingResponse, JSONResponse
 from databases.database import engine, create_database_if_not_exists
-from helpers.authentication import verify_yang_auth_token, verify_user_admin_auth_token
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from databases.seeds import seed_initial_data
 
@@ -22,6 +17,7 @@ from routers.tools import router as tool_router
 from routers.llm import router as llm_router
 from routers.agent import router as agent_router
 from routers.login import router as login_router
+from routers.chat import router as chat_router
 
 app_conf = AppConfig()
 aws_conf = AWSConfig()
@@ -57,7 +53,7 @@ async def lifespan(app: FastAPI):
                 await engine.dispose()
                 logger.info("🧹 Database connection closed.")
         except Exception as e:
-            logger.error(f"⚠️ Error during shutdown cleanup: {e}")
+            logger.error(f"⚠️ Error during shutdown cleanup: {e} \n TRACEBACK: ", traceback.format_exc())
         
 # ------------------- FastAPI App -------------------
 app = FastAPI(title=app_conf.app_name, version=app_conf.app_version, lifespan=lifespan)
@@ -76,70 +72,12 @@ app.include_router(tool_router)
 app.include_router(llm_router)
 app.include_router(agent_router)
 app.include_router(login_router)
+app.include_router(chat_router)
 
 # ------------------- API Endpoint -------------------
 @app.get("/health")
 def health():
     return {"status": "ok"}
-
-@app.post(f"/{app_conf.api_version_web}/chat/agent/completions", dependencies=[Depends(verify_yang_auth_token)])
-async def chat_agent_completions(req: ChatAgentRequest, http_req: Request):
-    try:
-        authorization_header = http_req.headers.get("Authorization")
-        if not authorization_header:
-            return JSONResponse(status_code=401, content={
-                "msg": "Missing authorization header"
-            })
-        
-        if Utils.check_api_authentication(authorization_header):
-
-            formatted_messages = Utils.format_agent_messages(req.messages)
-
-            if not formatted_messages:
-                return JSONResponse(status_code=400, content={"error": "No messages provided"})
-
-            message_payload = {"messages": formatted_messages}
-            
-            return StreamingResponse(streaming.agent_astreaming(chat_id=req.chat_session_id, message=message_payload, model_name=req.model_name, stream_mode="messages"), media_type="text/html")
-        else:
-            return JSONResponse(status_code=403, content={
-                "msg": "Invalid credential",
-            })
-    except Exception as e:
-        logger.error(f"An error occurred: {e} \n TRACEBACK: ", traceback.format_exc())
-        return JSONResponse(
-            status_code=500,
-            content={"error": str(e)}
-        )
-
-@app.post(f"/{app_conf.api_version_web}/chat/llm/completions", dependencies=[Depends(verify_yang_auth_token)])
-async def chat_llm_completions(req: ChatLLMRequest, http_req: Request):
-    try:
-        authorization_header = http_req.headers.get("Authorization")
-        if not authorization_header:
-            return JSONResponse(status_code=401, content={
-                "msg": "Missing authorization header"
-            })
-        
-        if Utils.check_api_authentication(authorization_header):
-            formatted_messages = Utils.format_agent_messages(req.messages)
-
-            if not formatted_messages:
-                return JSONResponse(status_code=400, content={"error": "No messages provided"})
-            
-            message_payload = {"messages": formatted_messages}
-
-            return StreamingResponse(streaming.llm_astreaming(chat_id=req.chat_session_id, message=message_payload, model_name=req.model_name), media_type="text/html")
-        else:
-            return JSONResponse(status_code=403, content={
-                "msg": "Invalid credential",
-            })
-    except Exception as e:
-        logger.error(f"An error occurred: {e} \n TRACEBACK: ", traceback.format_exc())
-        return JSONResponse(
-            status_code=500,
-            content={"error": str(e)}
-        )
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)

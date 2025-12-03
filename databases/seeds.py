@@ -59,7 +59,7 @@ async def seed_tool(session):
         {"name": "wikipedia", "display_name": "Wikipedia", "status": "enable", "logo": "📖", "description": "Retrieve general knowledge, summaries, and definitions.", "tags": ["Knowledge", "Reference"]},
         {"name": "google_search", "display_name": "GoogleSearch", "status": "disable", "logo": "🌐", "description": "Comprehensive Google-powered web search.", "tags": ["Search", "Web", "Public"]},
         {"name": "google_scholar", "display_name": "GoogleScholar", "status": "disable", "logo": "🎓", "description": "Search scholarly publications and citations.", "tags": ["Research", "Academic"]},
-        {"name": "google_trend", "display_name": "GoogleTrends", "status": "disable", "logo": "📈", "description": "Analyze trending search queries and interest over time.", "tags": ["Analytics", "Search"]},
+        {"name": "google_trends", "display_name": "GoogleTrends", "status": "disable", "logo": "📈", "description": "Analyze trending search queries and interest over time.", "tags": ["Analytics", "Search"]},
         {"name": "asknews", "display_name": "AskNews", "status": "disable", "logo": "🗞️", "description": "Fetch the latest breaking news from various sources.", "tags": ["News", "Trending"]},
         {"name": "reddit", "display_name": "RedditSearch", "status": "disable", "logo": "💬", "description": "Find community discussions and opinions from Reddit.", "tags": ["Community", "Social"]},
         {"name": "searx", "display_name": "SearxSearch", "status": "disable", "logo": "🕸️", "description": "Meta search engine combining results from multiple sources.", "tags": ["Search", "Meta"]},
