@@ -83,7 +83,8 @@ async def seed_llm(session):
     if not existing_llms:
         llms = [
             LLMModel(
-                name="Claude Sonet 4.5",
+                name="anthropic_claude_sonet_4_5",
+                display_name="Claude Sonet 4.5",
                 description="Anthropic Claude Sonet 4.5 LLM hosted on AWS Bedrock",
                 logo="claude.png",
                 provider="aws bedrock",
@@ -94,7 +95,8 @@ async def seed_llm(session):
                 system_prompt=PromptFactory.load_llm_prompt()
             ),
             LLMModel(
-                name="GPT-OSS 120B",
+                name="gpt_oss_120b",
+                display_name="GPT-OSS 120B",
                 description="GPT OSS models are open-source large language models hosted on AWS Bedrock.",
                 logo="openai.png",
                 provider="aws bedrock",
@@ -105,7 +107,8 @@ async def seed_llm(session):
                 system_prompt=PromptFactory.load_llm_prompt()
             ),
             LLMModel(
-                name="Llama 4 Scout 17B Instruct",
+                name="llama_4_scout_17b_instruct",
+                display_name="Llama 4 Scout 17B Instruct",
                 description="Meta Llama 4 Scout 17B Instruct model hosted on AWS Bedrock.",
                 logo="llama.png",
                 provider="aws bedrock",

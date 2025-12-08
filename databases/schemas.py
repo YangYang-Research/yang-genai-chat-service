@@ -115,6 +115,7 @@ class ToolOut(ToolBase):
 
 class LLMBase(BaseModel):
     name: str
+    display_name: str
     description: str
     logo: str
     provider: str
