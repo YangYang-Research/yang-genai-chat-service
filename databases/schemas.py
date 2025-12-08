@@ -115,6 +115,9 @@ class ToolOut(ToolBase):
 
 class LLMBase(BaseModel):
     name: str
+    description: str
+    logo: str
+    provider: str
     region: str
     model_id: str
     model_max_tokens: str

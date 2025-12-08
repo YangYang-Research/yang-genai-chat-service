@@ -81,15 +81,42 @@ async def seed_llm(session):
     existing_llms = result.scalars().all()
 
     if not existing_llms:
-        llm = LLMModel(
-            name="Claude Sonet 4.5",
-            region="ap-southeast-1",
-            model_id="global.anthropic.claude-sonnet-4-5-20250929-v1:0",
-            model_max_tokens="4096",
-            model_temperature="0.7",
-            system_prompt=PromptFactory.load_llm_prompt()
-        )
-        session.add(llm)
+        llms = [
+            LLMModel(
+                name="Claude Sonet 4.5",
+                description="Anthropic Claude Sonet 4.5 LLM hosted on AWS Bedrock",
+                logo="claude.png",
+                provider="aws bedrock",
+                region="us-east-1",
+                model_id="global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+                model_max_tokens="4096",
+                model_temperature="0.7",
+                system_prompt=PromptFactory.load_llm_prompt()
+            ),
+            LLMModel(
+                name="GPT-OSS 120B",
+                description="GPT OSS models are open-source large language models hosted on AWS Bedrock.",
+                logo="openai.png",
+                provider="aws bedrock",
+                region="us-east-1",
+                model_id="openai.gpt-oss-120b-1:0",
+                model_max_tokens="4096",
+                model_temperature="0.7",
+                system_prompt=PromptFactory.load_llm_prompt()
+            ),
+            LLMModel(
+                name="Llama 4 Scout 17B Instruct",
+                description="Meta Llama 4 Scout 17B Instruct model hosted on AWS Bedrock.",
+                logo="llama.png",
+                provider="aws bedrock",
+                region="us-east-1",
+                model_id="us.meta.llama4-scout-17b-instruct-v1:0",
+                model_max_tokens="4096",
+                model_temperature="0.7",
+                system_prompt=PromptFactory.load_llm_prompt()
+            )
+        ]
+        session.add_all(llms)
         await session.commit()
         logger.info("✅ LLMs seeded successfully")
 
