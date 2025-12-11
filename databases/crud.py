@@ -191,6 +191,11 @@ async def get_llm(db: AsyncSession, llm_id: int):
     )
     return result.scalars().first()
 
+async def get_llm_by_name(db: AsyncSession, llm_name: str):
+    result = await db.execute(
+        select(models.LLMModel).where(models.LLMModel.name == llm_name)
+    )
+    return result.scalars().first()
 
 async def update_llm(db: AsyncSession, llm_id: int, data: schemas.LLMUpdate):
     result = await db.execute(
@@ -244,6 +249,11 @@ async def get_agent(db: AsyncSession, agent_id: int):
     )
     return result.scalars().first()
 
+async def get_agent_by_llm_id(db: AsyncSession, llm_id: int):
+    result = await db.execute(
+        select(models.AgentModel).where(models.AgentModel.llm_id == llm_id)
+    )
+    return result.scalars().first()
 
 async def update_agent(db: AsyncSession, agent_id: int, data: schemas.AgentUpdate):
     result = await db.execute(

@@ -28,6 +28,7 @@ TOOL_CLASS_MAP = {
     "searx": SearxSearch,
     "openweather": OpenWeather
 }
+from databases.crud import get_llm_by_name, get_agent_by_llm_id
 
 class PromptFactory:
     def __init__(self):
@@ -69,29 +70,51 @@ class AgentFactory:
 
         return tools
     
+    async def get_llm(self, model_name: str):
+        """Fetch the LLM from the database and return it."""
+        async with SessionLocal() as session:
+            llm = await get_llm_by_name(session, model_name)
+        
+        return llm
+
+    async def get_agent(self, llm_id: int):
+        """Fetch the agent from the database and return it."""
+        async with SessionLocal() as session:
+            agent = await get_agent_by_llm_id(session, llm_id)
+        
+        return agent
+    
     async def agent(self, model_name: str):
         """Create and return an LLM agent with appropriate model and tools."""
         model_name = (model_name or "").lower()
-
-        if model_name == "claude":
-            llm = self.chat_converse.claude_model_text()
-        elif model_name == "llama":
-            # llm = self.chat_converse.titan_model_text()
-            return None
-        elif model_name == "gpt-oss":
-            # llm = self.chat_converse.mistral_model_text()
-            return None
+        
+        llm = await self.get_llm(model_name)
+        if not llm:
+            raise ValueError(f"[Agent] LLM not found: {model_name}")
         else:
-            raise ValueError(f"[Agent] Unsupported model: {model_name}")
+            build_converse = self.chat_converse.build_converse(llm)
 
-        active_tools = await self.get_enabled_tools()
+        system_active_tools = await self.get_enabled_tools()
 
-        # Create the LangChain agent
-        return create_agent(
-            system_prompt=self.GENERAL_ASSISTANT_PROMPT,
-            tools=active_tools,
-            model=llm,
-        )
+        agent = await self.get_agent(llm.id)
+        if not agent:
+            raise ValueError(f"[Agent] Agent not found: {llm.id}")
+        else:
+            agent_tools = agent.tools
+            agent_active_tools = [TOOL_CLASS_MAP.get(t['name']) for t in agent_tools]
+
+            # Use tool name for intersection due to unhashable StructuredTool
+            system_active_tool_names = {tool.name for tool in system_active_tools if tool is not None}
+            active_tools = [tool for tool in agent_active_tools if tool and tool.name in system_active_tool_names]
+
+            agent = create_agent(
+                system_prompt=agent.system_prompt,
+                tools=active_tools,
+                model=build_converse,
+            )
+
+            # Create the LangChain agent
+            return agent
 
 class LLMFactory:
     def __init__(self):
