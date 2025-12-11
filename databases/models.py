@@ -9,18 +9,18 @@ class LLMModel(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     
     name = Column(String(64), nullable=False, unique=True)
-    display_name = Column(String(100), nullable=True)
+    display_name = Column(String(100), nullable=False)
     description = Column(Text, nullable=True)
-    logo = Column(String(255), nullable=True)
-    provider = Column(String(64), nullable=False)  # e.g., "aws", "openai", "azure"
+    logo = Column(String(255), nullable=False, default="yang.png")
+    provider = Column(String(64), nullable=True)  # e.g., "aws", "openai", "azure"
     
     # AWS Region
-    region = Column(String(64), default="ap-southeast-1")
+    region = Column(String(64), nullable=False, default="ap-southeast-1")
 
     # Model
-    model_id = Column(String(255), nullable=True)
-    model_max_tokens = Column(String(16), default="2048")
-    model_temperature = Column(String(8), default="0.7")
+    model_id = Column(String(255), nullable=False)
+    model_max_tokens = Column(String(16), nullable=False, default="2048")
+    model_temperature = Column(String(8), nullable=False, default="0.7")
 
     # Guardrails
     guardrail_id = Column(String(255), nullable=True)

@@ -134,9 +134,19 @@ class LLMCreate(LLMBase):
 
 class LLMUpdate(BaseModel):
     name: Optional[str] = None
+    display_name: Optional[str] = None
+    description: Optional[str] = None
+    logo: Optional[str] = None
+    provider: Optional[str] = None
+    region: Optional[str] = None
     status: Optional[str] = None
     trashed: Optional[bool] = None
     model_id: Optional[str] = None
+    model_max_tokens: Optional[str] = None
+    model_temperature: Optional[str] = None
+    guardrail_id: Optional[str] = None
+    guardrail_version: Optional[str] = None
+    system_prompt: Optional[str] = None
     status: Optional[str] = None
 
 class LLMRead(LLMBase):
