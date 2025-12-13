@@ -10,9 +10,9 @@ class Streaming():
         self.agent_factory = AgentFactory()
         self.llm_factory = LLMFactory()
         
-    async def agent_astreaming(self, chat_id: str, message: dict, model_name: str, stream_mode: str) -> AsyncGenerator[str, None]:
+    async def agent_astreaming(self, chat_id: str, message: dict, agent_name: str, model_name: str, stream_mode: str) -> AsyncGenerator[str, None]:
         try:
-            agent = await self.agent_factory.agent(model_name=model_name)
+            agent = await self.agent_factory.agent(agent_name=agent_name, model_name=model_name)
             if agent:
                 # The ReAct agent returns a dict with 'output'
                 async for token, metadata in agent.astream(input=message, stream_mode=stream_mode):
@@ -26,7 +26,7 @@ class Streaming():
                                     await asyncio.sleep(0)
                 yield "\n"
             else:
-                yield f"Model {model_name} not found."
+                yield f"Agent {agent_name} with model {model_name} not found."
         except Exception as e:
             yield f"\n[Error] {str(e)}"
             logger.error(f"An error occurred: {e} \n TRACEBACK: ", traceback.format_exc())

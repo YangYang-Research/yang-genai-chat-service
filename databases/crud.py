@@ -249,9 +249,9 @@ async def get_agent(db: AsyncSession, agent_id: int):
     )
     return result.scalars().first()
 
-async def get_agent_by_llm_id(db: AsyncSession, llm_id: int):
+async def get_agent_by_name(db: AsyncSession, agent_name: str):
     result = await db.execute(
-        select(models.AgentModel).where(models.AgentModel.llm_id == llm_id)
+        select(models.AgentModel).where(models.AgentModel.name == agent_name)
     )
     return result.scalars().first()
 

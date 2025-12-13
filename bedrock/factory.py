@@ -1,4 +1,5 @@
 import os
+import json
 from databases.crud import get_enabled_tools
 from databases.database import SessionLocal
 from bedrock.converse import Converse
@@ -28,7 +29,7 @@ TOOL_CLASS_MAP = {
     "searx": SearxSearch,
     "openweather": OpenWeather
 }
-from databases.crud import get_llm_by_name, get_agent_by_llm_id
+from databases.crud import get_llm_by_name, get_agent_by_name
 
 class PromptFactory:
     def __init__(self):
@@ -77,44 +78,49 @@ class AgentFactory:
         
         return llm
 
-    async def get_agent(self, llm_id: int):
+    async def get_agent(self, agent_name: str):
         """Fetch the agent from the database and return it."""
         async with SessionLocal() as session:
-            agent = await get_agent_by_llm_id(session, llm_id)
+            agent = await get_agent_by_name(session, agent_name)
         
         return agent
     
-    async def agent(self, model_name: str):
+    async def agent(self, agent_name: str, model_name: str):
         """Create and return an LLM agent with appropriate model and tools."""
+        agent_name = (agent_name or "").lower()
         model_name = (model_name or "").lower()
         
+        agent = await self.get_agent(agent_name)
+        if not agent:
+            return None
+
         llm = await self.get_llm(model_name)
         if not llm:
-            raise ValueError(f"[Agent] LLM not found: {model_name}")
-        else:
-            build_converse = self.chat_converse.build_converse(llm)
+            return None
+        
+        agent_llm_ids = json.loads(agent.llm_ids)
+        if str(llm.id) not in [str(item['id']) for item in agent_llm_ids]:
+            return None
+        
+        build_converse = self.chat_converse.build_converse(llm)
 
         system_active_tools = await self.get_enabled_tools()
+        
+        agent_tools = json.loads(agent.tools)
+        agent_active_tools = [TOOL_CLASS_MAP.get(t['name']) for t in agent_tools]
 
-        agent = await self.get_agent(llm.id)
-        if not agent:
-            raise ValueError(f"[Agent] Agent not found: {llm.id}")
-        else:
-            agent_tools = agent.tools
-            agent_active_tools = [TOOL_CLASS_MAP.get(t['name']) for t in agent_tools]
+        # Use tool name for intersection due to unhashable StructuredTool
+        system_active_tool_names = {tool.name for tool in system_active_tools if tool is not None}
+        active_tools = [tool for tool in agent_active_tools if tool and tool.name in system_active_tool_names]
 
-            # Use tool name for intersection due to unhashable StructuredTool
-            system_active_tool_names = {tool.name for tool in system_active_tools if tool is not None}
-            active_tools = [tool for tool in agent_active_tools if tool and tool.name in system_active_tool_names]
+        agent = create_agent(
+            system_prompt=agent.system_prompt,
+            tools=active_tools,
+            model=build_converse,
+        ).with_config({"recursion_limit": 200})
 
-            agent = create_agent(
-                system_prompt=agent.system_prompt,
-                tools=active_tools,
-                model=build_converse,
-            )
-
-            # Create the LangChain agent
-            return agent
+        # Create the LangChain agent
+        return agent
 
 class LLMFactory:
     def __init__(self):

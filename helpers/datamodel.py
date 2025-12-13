@@ -25,8 +25,9 @@ class ChatAgentMessage(BaseModel):
     content: Union[str, List[ContentBlock]]
 
 class ChatAgentRequest(BaseModel):
-    chat_session_id: Optional[str] = None
-    model_name: Optional[str] = None
+    chat_session_id: str
+    agent_name: str
+    model_name: str
     messages: List[ChatAgentMessage]
 
 class ChatLLMMessage(BaseModel):
@@ -34,6 +35,6 @@ class ChatLLMMessage(BaseModel):
     content: Union[str, List[ContentBlock]]
 
 class ChatLLMRequest(BaseModel):
-    chat_session_id: Optional[str] = None
-    model_name: Optional[str] = None
+    chat_session_id: str
+    model_name: str
     messages: List[ChatLLMMessage]

@@ -23,7 +23,7 @@ async def chat_agent_completions(req: ChatAgentRequest, http_req: Request):
 
         message_payload = {"messages": formatted_messages}
         
-        return StreamingResponse(streaming.agent_astreaming(chat_id=req.chat_session_id, message=message_payload, model_name=req.model_name, stream_mode="messages"), media_type="text/html")
+        return StreamingResponse(streaming.agent_astreaming(chat_id=req.chat_session_id, message=message_payload, agent_name=req.agent_name, model_name=req.model_name, stream_mode="messages"), media_type="text/html")
 
     except Exception as e:
         logger.error(f"An error occurred: {e} \n TRACEBACK: ", traceback.format_exc())
