@@ -1,5 +1,4 @@
 import secrets
-import json
 from helpers.loog import logger
 from helpers.config import AppConfig
 from databases.models import RoleModel, UserModel, ToolModel, LLMModel, AgentModel
@@ -150,9 +149,9 @@ async def seed_agent(session):
             description="Yang Agent is a general-purpose agent that can use the tools provided to perform tasks.",
             logo="yang.png",
             tags=["general", "agent"],
-            llm_ids=json.dumps(llm_ids),
+            llm_ids=llm_ids,
             system_prompt=PromptFactory.load_agent_prompt(),
-            tools=json.dumps(tool_list),
+            tools=tool_list,
             default_agent=True,
         )
 

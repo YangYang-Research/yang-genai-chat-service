@@ -165,11 +165,15 @@ class LLMOut(LLMBase):
 
 class AgentBase(BaseModel):
     name: str
+    display_name: Optional[str] = None
+    description: Optional[str] = None
+    logo: Optional[str] = None
+    tags: Optional[List[str]] = None
     status: str
     trashed: bool
     default_agent: bool
     knowledge_base_id: Optional[str] = None
-    llm_id: int
+    llm_ids: Optional[List[Any]] = None
     system_prompt: Optional[str] = None
     tools: Optional[List[Any]] = None  # stored JSON
 
@@ -178,11 +182,15 @@ class AgentCreate(AgentBase):
 
 class AgentUpdate(BaseModel):
     name: Optional[str] = None
+    display_name: Optional[str] = None
+    description: Optional[str] = None
+    logo: Optional[str] = None
+    tags: Optional[List[str]] = None
     status: Optional[str] = None
     trashed: Optional[bool] = None
     default_agent: Optional[bool] = None
     knowledge_base_id: Optional[str] = None
-    llm_id: Optional[int] = None
+    llm_ids: Optional[List[Any]] = None
     system_prompt: Optional[str] = None
     tools: Optional[List[Any]] = None
 

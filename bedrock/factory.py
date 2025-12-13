@@ -98,7 +98,7 @@ class AgentFactory:
         if not llm:
             return None
         
-        agent_llm_ids = json.loads(agent.llm_ids)
+        agent_llm_ids = agent.llm_ids
         if str(llm.id) not in [str(item['id']) for item in agent_llm_ids]:
             return None
         
@@ -106,13 +106,13 @@ class AgentFactory:
 
         system_active_tools = await self.get_enabled_tools()
         
-        agent_tools = json.loads(agent.tools)
+        agent_tools = agent.tools
         agent_active_tools = [TOOL_CLASS_MAP.get(t['name']) for t in agent_tools]
 
         # Use tool name for intersection due to unhashable StructuredTool
         system_active_tool_names = {tool.name for tool in system_active_tools if tool is not None}
         active_tools = [tool for tool in agent_active_tools if tool and tool.name in system_active_tool_names]
-
+        
         agent = create_agent(
             system_prompt=agent.system_prompt,
             tools=active_tools,
