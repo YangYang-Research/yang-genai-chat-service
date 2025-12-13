@@ -36,20 +36,22 @@ class LLMModel(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    agents = relationship("AgentModel", back_populates="llms")
-
 class AgentModel(Base):
     __tablename__ = "agents"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
 
     name = Column(String(100), nullable=False, unique=True)
-
+    display_name = Column(String(100), nullable=True)
+    description = Column(Text, nullable=True)
+    logo = Column(String(255), nullable=True)
+    tags = Column(JSON, nullable=True)
+    
     # Knowledge Base
     knowledge_base_id = Column(String(255), nullable=True)
 
-    # LLM id
-    llm_id = Column(Integer, ForeignKey("llms.id"))
+    # LLMs list as JSON
+    llm_ids = Column(JSON, nullable=True)
 
     # System prompt
     system_prompt = Column(Text, nullable=True)
@@ -64,8 +66,6 @@ class AgentModel(Base):
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-
-    llms = relationship("LLMModel", back_populates="agents")
 
 class ToolModel(Base):
     __tablename__ = "tools"

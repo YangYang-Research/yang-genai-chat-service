@@ -1,4 +1,5 @@
 import secrets
+import json
 from helpers.loog import logger
 from helpers.config import AppConfig
 from databases.models import RoleModel, UserModel, ToolModel, LLMModel, AgentModel
@@ -130,8 +131,9 @@ async def seed_agent(session):
 
     if not existing_agents:
         # Get first LLM
-        sql_llm = await session.execute(select(LLMModel))
-        llm = sql_llm.scalars().first()
+        sql_all_llms = await session.execute(select(LLMModel))
+        all_llms = sql_all_llms.scalars().all()
+        llm_ids = [{"id": l.id, "name": l.name} for l in all_llms]
 
         # Get enabled tools
         sql_tools = await session.execute(
@@ -143,10 +145,14 @@ async def seed_agent(session):
         tool_list = [{"id": t.id, "name": t.name} for t in enabled_tools]
 
         agent = AgentModel(
-            name="Yang-Agent",
-            llm_id=llm.id,
+            name="yang-agent",
+            display_name="Yang Agent",
+            description="Yang Agent is a general-purpose agent that can use the tools provided to perform tasks.",
+            logo="yang.png",
+            tags=["general", "agent"],
+            llm_ids=json.dumps(llm_ids),
             system_prompt=PromptFactory.load_agent_prompt(),
-            tools=tool_list,
+            tools=json.dumps(tool_list),
             default_agent=True,
         )
 
