@@ -145,8 +145,8 @@ async def seed_agent(session):
 
         agent = AgentModel(
             name="yang-agent",
-            display_name="Yang Agent",
-            description="Yang Agent is a general-purpose agent that can use the tools provided to perform tasks.",
+            display_name="YangYang",
+            description="YangYang is a general-purpose agent that can use the tools provided to perform tasks.",
             logo="yang.png",
             tags=["general", "agent"],
             llm_ids=llm_ids,
