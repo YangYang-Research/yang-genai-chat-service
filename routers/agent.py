@@ -23,18 +23,18 @@ async def list_agents_route(db: AsyncSession = Depends(get_db)):
     return await get_agents(db)
 
 
-@router.get("/{agent_id}", dependencies=[Depends(verify_yang_auth_token)], response_model=AgentOut)
-async def get_agent_route(agent_id: int, db: AsyncSession = Depends(get_db)):
-    agent = await get_agent(db, agent_id)
-    if not agent:
-        raise HTTPException(status_code=404, detail="Agent not found")
-    return agent
-
 @router.get("/default", dependencies=[Depends(verify_yang_auth_token)], response_model=AgentOut)
 async def get_default_agent_route(db: AsyncSession = Depends(get_db)):
     agent = await get_default_agent(db)
     if not agent:
         raise HTTPException(status_code=404, detail="Default agent not found")
+    return agent
+
+@router.get("/{agent_id}", dependencies=[Depends(verify_yang_auth_token)], response_model=AgentOut)
+async def get_agent_route(agent_id: int, db: AsyncSession = Depends(get_db)):
+    agent = await get_agent(db, agent_id)
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
     return agent
 
 @router.put("/{agent_id}", dependencies=[Depends(verify_yang_auth_token)], response_model=AgentOut)
