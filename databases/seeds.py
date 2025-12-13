@@ -55,9 +55,9 @@ async def seed_admin(session):
 
 async def seed_tool(session):
     tools = [
-        {"name": "duckduckgo", "display_name": "DuckDuckGo", "status": "enable", "logo": "🦆", "description": "Privacy-focused general-purpose web search.", "tags": ["Search", "Web", "Private"]},
-        {"name": "arxiv", "display_name": "Arxiv", "status": "enable", "logo": "📚", "description": "Search academic papers and preprints from arXiv.", "tags": ["Research", "Academic"]},
-        {"name": "wikipedia", "display_name": "Wikipedia", "status": "enable", "logo": "📖", "description": "Retrieve general knowledge, summaries, and definitions.", "tags": ["Knowledge", "Reference"]},
+        {"name": "duckduckgo", "display_name": "DuckDuckGo", "status": "disable", "logo": "🦆", "description": "Privacy-focused general-purpose web search.", "tags": ["Search", "Web", "Private"]},
+        {"name": "arxiv", "display_name": "Arxiv", "status": "disable", "logo": "📚", "description": "Search academic papers and preprints from arXiv.", "tags": ["Research", "Academic"]},
+        {"name": "wikipedia", "display_name": "Wikipedia", "status": "disable", "logo": "📖", "description": "Retrieve general knowledge, summaries, and definitions.", "tags": ["Knowledge", "Reference"]},
         {"name": "google_search", "display_name": "GoogleSearch", "status": "disable", "logo": "🌐", "description": "Comprehensive Google-powered web search.", "tags": ["Search", "Web", "Public"]},
         {"name": "google_scholar", "display_name": "GoogleScholar", "status": "disable", "logo": "🎓", "description": "Search scholarly publications and citations.", "tags": ["Research", "Academic"]},
         {"name": "google_trends", "display_name": "GoogleTrends", "status": "disable", "logo": "📈", "description": "Analyze trending search queries and interest over time.", "tags": ["Analytics", "Search"]},
