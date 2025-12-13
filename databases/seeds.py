@@ -1,7 +1,7 @@
 import secrets
 from helpers.loog import logger
 from helpers.config import AppConfig
-from databases.models import RoleModel, UserModel, ToolModel, LLMModel, AgentModel
+from databases.models import RoleModel, UserModel, ToolModel, LLMModel, AgentModel, TagModel
 from sqlalchemy.future import select
 from passlib.context import CryptContext
 from bedrock.factory import PromptFactory
@@ -148,7 +148,7 @@ async def seed_agent(session):
             display_name="YangYang",
             description="YangYang is a general-purpose agent that can use the tools provided to perform tasks.",
             logo="yang.png",
-            tags=["general", "agent"],
+            tags=["General", "Agent"],
             llm_ids=llm_ids,
             system_prompt=PromptFactory.load_agent_prompt(),
             tools=tool_list,
@@ -159,9 +159,41 @@ async def seed_agent(session):
         await session.commit()
         logger.info("✅ Agents seeded successfully")
 
+async def seed_tag(session):
+    """Initialize default tag."""
+    result = await session.execute(select(TagModel))
+    existing_tags = result.scalars().all()
+
+    if not existing_tags:
+        tags = [
+            TagModel(tag="YangYang", status="enable", trashed=False),
+            TagModel(tag="General", status="enable", trashed=False),
+            TagModel(tag="Agent", status="enable", trashed=False),
+            TagModel(tag="Research", status="enable", trashed=False),
+            TagModel(tag="Academic", status="enable", trashed=False),
+            TagModel(tag="Community", status="enable", trashed=False),
+            TagModel(tag="Social", status="enable", trashed=False),
+            TagModel(tag="Environment", status="enable", trashed=False),
+            TagModel(tag="Utility", status="enable", trashed=False),
+            TagModel(tag="Search", status="enable", trashed=False),
+            TagModel(tag="Web", status="enable", trashed=False),
+            TagModel(tag="Private", status="enable", trashed=False),
+            TagModel(tag="Knowledge", status="enable", trashed=False),
+            TagModel(tag="Reference", status="enable", trashed=False),
+            TagModel(tag="News", status="enable", trashed=False),
+            TagModel(tag="Trending", status="enable", trashed=False),
+            TagModel(tag="Analytics", status="enable", trashed=False),
+            TagModel(tag="Meta", status="enable", trashed=False),
+            TagModel(tag="Weather", status="enable", trashed=False),
+        ]
+        session.add_all(tags)
+        await session.commit()
+        logger.info("✅ Tags seeded successfully")
+
 async def seed_initial_data(session):
     await seed_role(session)
     await seed_admin(session)
     await seed_tool(session)
     await seed_llm(session)
     await seed_agent(session)
+    await seed_tag(session)

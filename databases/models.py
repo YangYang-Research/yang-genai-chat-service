@@ -147,3 +147,17 @@ class MessageModel(Base):
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
 
     users = relationship("UserModel", back_populates="messages")
+
+class TagModel(Base):
+    __tablename__ = "tags"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+
+    tag = Column(String(50), unique=True, nullable=False)
+
+    status = Column(String(16), default="enable")
+    trashed = Column(Boolean, default=False)
+
+    # Metadata
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())

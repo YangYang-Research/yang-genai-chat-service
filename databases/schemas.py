@@ -205,3 +205,30 @@ class AgentOut(AgentBase):
     id: int
 
     model_config = {"from_attributes": True}
+
+# ------------------- Tag Schemas -------------------
+
+class TagBase(BaseModel):
+    tag: str
+    status: str
+    trashed: bool
+
+class TagCreate(TagBase):
+    pass
+
+class TagUpdate(BaseModel):
+    tag: Optional[str] = None
+    status: Optional[str] = None
+    trashed: Optional[bool] = None 
+
+class TagRead(TagBase):
+    id: int
+    created_at: datetime
+    updated_at: Optional[datetime]
+
+    model_config = {"from_attributes": True}
+
+class TagOut(TagBase):
+    id: int
+
+    model_config = {"from_attributes": True}
