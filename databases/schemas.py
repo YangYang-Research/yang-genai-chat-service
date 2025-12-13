@@ -167,6 +167,7 @@ class AgentBase(BaseModel):
     name: str
     status: str
     trashed: bool
+    default_agent: bool
     knowledge_base_id: Optional[str] = None
     llm_id: int
     system_prompt: Optional[str] = None
@@ -179,6 +180,7 @@ class AgentUpdate(BaseModel):
     name: Optional[str] = None
     status: Optional[str] = None
     trashed: Optional[bool] = None
+    default_agent: Optional[bool] = None
     knowledge_base_id: Optional[str] = None
     llm_id: Optional[int] = None
     system_prompt: Optional[str] = None

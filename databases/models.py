@@ -59,6 +59,7 @@ class AgentModel(Base):
 
     status = Column(String(16), default="enable")
     trashed = Column(Boolean, default=False)
+    default_agent = Column(Boolean, default=False)
     
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())

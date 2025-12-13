@@ -147,6 +147,7 @@ async def seed_agent(session):
             llm_id=llm.id,
             system_prompt=PromptFactory.load_agent_prompt(),
             tools=tool_list,
+            default_agent=True,
         )
 
         session.add(agent)
