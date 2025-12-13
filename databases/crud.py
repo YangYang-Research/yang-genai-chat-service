@@ -293,3 +293,62 @@ async def get_default_agent(db: AsyncSession):
         select(models.AgentModel).where(models.AgentModel.default_agent == True)
     )
     return result.scalars().first()
+
+# -------------------  TAGS  -------------------
+
+async def create_tag(db: AsyncSession, data: schemas.TagCreate):
+    tag_data = data.model_dump()
+    tag = models.TagModel(**tag_data)
+    db.add(tag)
+    await db.commit()
+    await db.refresh(tag)
+    return tag
+
+async def get_tags(db: AsyncSession):
+    result = await db.execute(select(models.TagModel))
+    return result.scalars().all()
+
+async def get_tag(db: AsyncSession, tag_id: int):
+    result = await db.execute(
+        select(models.TagModel).where(models.TagModel.id == tag_id)
+    )
+    return result.scalars().first()
+
+async def get_enabled_tags(db: AsyncSession):
+    result = await db.execute(select(models.TagModel).where(models.TagModel.status == "enable"))
+    return result.scalars().all()
+    
+async def get_tag_by_name(db: AsyncSession, tag_name: str):
+    result = await db.execute(
+        select(models.TagModel).where(models.TagModel.tag == tag_name)
+    )
+    return result.scalars().first()
+
+async def update_tag(db: AsyncSession, tag_id: int, data: schemas.TagUpdate):
+    result = await db.execute(
+        select(models.TagModel).where(models.TagModel.id == tag_id)
+    )
+    tag = result.scalars().first()
+    if not tag:
+        return None
+
+    updates = data.model_dump(exclude_unset=True)
+    for key, value in updates.items():
+        setattr(tag, key, value)
+
+    db.add(tag)
+    await db.commit()
+    await db.refresh(tag)
+    return tag
+
+async def delete_tag(db: AsyncSession, tag_id: int):
+    result = await db.execute(
+        select(models.TagModel).where(models.TagModel.id == tag_id)
+    )
+    tag = result.scalars().first()
+    if not tag:
+        return None
+
+    await db.delete(tag)
+    await db.commit()
+    return True

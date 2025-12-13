@@ -18,6 +18,7 @@ from routers.llm import router as llm_router
 from routers.agent import router as agent_router
 from routers.login import router as login_router
 from routers.chat import router as chat_router
+from routers.tag import router as tag_router
 
 app_conf = AppConfig()
 aws_conf = AWSConfig()
@@ -73,6 +74,7 @@ app.include_router(llm_router)
 app.include_router(agent_router)
 app.include_router(login_router)
 app.include_router(chat_router)
+app.include_router(tag_router)
 
 # ------------------- API Endpoint -------------------
 @app.get("/health")
