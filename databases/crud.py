@@ -287,3 +287,9 @@ async def delete_agent(db: AsyncSession, agent_id: int):
     await db.delete(agent)
     await db.commit()
     return True
+
+async def get_default_agent(db: AsyncSession):
+    result = await db.execute(
+        select(models.AgentModel).where(models.AgentModel.default_agent == True)
+    )
+    return result.scalars().first()

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from databases.schemas import AgentCreate, AgentUpdate, AgentOut
 from databases.crud import (
-    create_agent, get_agents, get_agent, update_agent, delete_agent
+    create_agent, get_agents, get_agent, update_agent, delete_agent, get_default_agent
 )
 from databases.database import get_db
 from helpers.authentication import verify_yang_auth_token, verify_user_admin_auth_token
@@ -30,6 +30,12 @@ async def get_agent_route(agent_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Agent not found")
     return agent
 
+@router.get("/default", dependencies=[Depends(verify_yang_auth_token)], response_model=AgentOut)
+async def get_default_agent_route(db: AsyncSession = Depends(get_db)):
+    agent = await get_default_agent(db)
+    if not agent:
+        raise HTTPException(status_code=404, detail="Default agent not found")
+    return agent
 
 @router.put("/{agent_id}", dependencies=[Depends(verify_yang_auth_token)], response_model=AgentOut)
 async def update_agent_route(agent_id: int, data: AgentUpdate, db: AsyncSession = Depends(get_db)):
