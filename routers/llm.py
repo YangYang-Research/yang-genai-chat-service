@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from databases.schemas import LLMCreate, LLMUpdate, LLMOut
 from databases.crud import (
-    create_llm, get_llms, get_llm, update_llm, delete_llm
+    create_llm, get_llms, get_llm, update_llm, delete_llm, get_enabled_llms
 )
 from databases.database import get_db
 from helpers.authentication import verify_yang_auth_token, verify_user_admin_auth_token
@@ -23,6 +23,9 @@ async def create_llm_route(data: LLMCreate, db: AsyncSession = Depends(get_db)):
 async def list_llms_route(db: AsyncSession = Depends(get_db)):
     return await get_llms(db)
 
+@router.get("/enabled", dependencies=[Depends(verify_yang_auth_token)], response_model=list[LLMOut])
+async def list_enabled_llms_route(db: AsyncSession = Depends(get_db)):
+    return await get_enabled_llms(db)
 
 @router.get("/{llm_id}", dependencies=[Depends(verify_yang_auth_token)], response_model=LLMOut)
 async def get_llm_route(llm_id: int, db: AsyncSession = Depends(get_db)):

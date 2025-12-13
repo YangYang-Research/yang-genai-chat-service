@@ -184,6 +184,9 @@ async def get_llms(db: AsyncSession):
     result = await db.execute(select(models.LLMModel))
     return result.scalars().all()
 
+async def get_enabled_llms(db: AsyncSession):
+    result = await db.execute(select(models.LLMModel).where(models.LLMModel.status == "enable"))
+    return result.scalars().all()
 
 async def get_llm(db: AsyncSession, llm_id: int):
     result = await db.execute(
