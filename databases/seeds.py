@@ -132,7 +132,7 @@ async def seed_agent(session):
         # Get first LLM
         sql_all_llms = await session.execute(select(LLMModel))
         all_llms = sql_all_llms.scalars().all()
-        llm_ids = [{"id": l.id, "name": l.name, "display_name": l.display_name} for l in all_llms]
+        llm_ids = [{"id": l.id, "name": l.name} for l in all_llms]
 
         # Get enabled tools
         sql_tools = await session.execute(
@@ -141,7 +141,7 @@ async def seed_agent(session):
         enabled_tools = sql_tools.scalars().all()
 
         # Convert tools → [{"id":1,"name":"duckduckgo"}, ...]
-        tool_list = [{"id": t.id, "name": t.name, "display_name": t.display_name} for t in enabled_tools]
+        tool_list = [{"id": t.id, "name": t.name} for t in enabled_tools]
 
         agent = AgentModel(
             name="yang-agent",
