@@ -12,8 +12,9 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from databases.seeds import seed_initial_data
 
 from routers.user import router as user_router
+from routers.role import router as role_router
 from routers.message import router as message_router
-from routers.tools import router as tool_router
+from routers.tool import router as tool_router
 from routers.llm import router as llm_router
 from routers.agent import router as agent_router
 from routers.login import router as login_router
@@ -68,6 +69,7 @@ app.add_middleware(
 )
 
 app.include_router(user_router)
+app.include_router(role_router)
 app.include_router(message_router)
 app.include_router(tool_router)
 app.include_router(llm_router)

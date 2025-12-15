@@ -2,10 +2,38 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional, List, Any
 from datetime import datetime
 
+# ------------------- Role Schemas -------------------
+
+class RoleBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    status: str
+    trashed: bool
+
+class RoleCreate(RoleBase):
+    pass
+
+class RoleUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    status: Optional[str] = None
+    trashed: Optional[bool] = None
+
+class RoleRead(RoleBase):
+    id: int
+    created_at: datetime
+    updated_at: Optional[datetime]
+
+    model_config = {"from_attributes": True}
+
+class RoleOut(RoleBase):
+    id: int
+
+    model_config = {"from_attributes": True}
+
 # ------------------- User Schemas -------------------
 
 class UserBase(BaseModel):
-    id: int
     username: str
     email: EmailStr
     fullname: Optional[str] = None
@@ -21,6 +49,7 @@ class UserUpdate(BaseModel):
     username: Optional[str] = None
     email: Optional[EmailStr] = None
     fullname: Optional[str] = None
+    role_id: Optional[int] = None
     hashed_password: Optional[str] = None
     active_status: str
     trashed: bool

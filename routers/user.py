@@ -16,7 +16,10 @@ router = APIRouter(prefix=f"/{app_conf.api_version_web}/users", tags=["Users"])
 
 @router.post("/", dependencies=[Depends(verify_yang_auth_token)], response_model=UserOut, status_code=status.HTTP_201_CREATED)
 async def create_user_route(data: UserCreate, db: AsyncSession = Depends(get_db)):
-    return await create_user(db, data)
+    user = await create_user(db, data)
+    if not user:
+        raise HTTPException(status_code=400, detail="User already exists")
+    return user
 
 
 @router.get("/", dependencies=[Depends(verify_yang_auth_token)], response_model=list[UserOut])
@@ -35,8 +38,11 @@ async def get_user_route(user_id: int, db: AsyncSession = Depends(get_db)):
 @router.put("/{user_id}", dependencies=[Depends(verify_yang_auth_token)], response_model=UserOut)
 async def update_user_route(user_id: int, data: UserUpdate, db: AsyncSession = Depends(get_db)):
     user = await update_user(db, user_id, data)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+    if isinstance(user, tuple):
+        if user[0] == 404:
+            raise HTTPException(status_code=404, detail="User not found")
+        elif user[0] == 400:
+            raise HTTPException(status_code=400, detail="Username or email already taken")
     return user
 
 

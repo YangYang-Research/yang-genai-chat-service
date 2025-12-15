@@ -153,7 +153,7 @@ class TagModel(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
 
-    tag = Column(String(50), unique=True, nullable=False)
+    tag = Column(String(50), nullable=False)
 
     status = Column(String(16), default="enable")
     trashed = Column(Boolean, default=False)
