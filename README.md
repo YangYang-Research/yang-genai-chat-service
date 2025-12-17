@@ -1,7 +1,10 @@
-# 🧠 Yang GenAI Chat Service
+# Yang - GenAI Chat Service
 
-**Yang GenAI Chat Service** is a lightweight, modular backend service designed to power **Generative AI chat experiences**.  
-Built on **FastAPI**, it integrates **LangChain**, **AWS Bedrock**, and a flexible plugin system for multi-source reasoning and retrieval.
+<p align="center">
+  <img width="200" height="200" alt="YangYang_Full_Merge" src="https://github.com/user-attachments/assets/2eba713e-328c-4dd4-ae3d-02c7f9b13047" />
+</p>
+
+<h3><p align="center">Yang - A lightweight, modular backend service designed to power Generative AI chat experiences.</p></h3>
 
 
 ## 🚀 Features
