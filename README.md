@@ -3,7 +3,6 @@
 **Yang GenAI Chat Service** is a lightweight, modular backend service designed to power **Generative AI chat experiences**.  
 Built on **FastAPI**, it integrates **LangChain**, **AWS Bedrock**, and a flexible plugin system for multi-source reasoning and retrieval.
 
----
 
 ## 🚀 Features
 
@@ -18,7 +17,6 @@ Built on **FastAPI**, it integrates **LangChain**, **AWS Bedrock**, and a flexib
 - 👥 **User & Role Management** — Multi-user support with role-based access control  
 - 🏷️ **Tagging System** — Organize and categorize conversations and messages  
 
----
 
 ## 🏗️ Architecture Overview
 
@@ -36,14 +34,12 @@ Built on **FastAPI**, it integrates **LangChain**, **AWS Bedrock**, and a flexib
                  │  💾 PostgreSQL Persistence │
                  │  🔐 AWS Secrets Integration│
                  └────────────┬───────────────┘
-                             ▼
+                              ▼
                  ┌────────────────────────────┐
                  │     AWS Bedrock Models     │
                  │   (Claude, Titan, etc.)    │
                  └────────────────────────────┘
 
-
----
 
 ## 🧰 Tech Stack
 
@@ -56,7 +52,6 @@ Built on **FastAPI**, it integrates **LangChain**, **AWS Bedrock**, and a flexib
 | **LLM Provider** | AWS Bedrock |
 | **Environment** | Python 3.10+ |
 
----
 
 ## 🧩 Agent Tools
 
@@ -77,7 +72,6 @@ These tools can be dynamically enabled or extended via LangChain Tool APIs.
 | **OpenWeather** | Real-time weather information |
 | **DateTime** | Current date and time queries with timezone support |
 
----
 
 ## 📦 Installation
 
@@ -148,7 +142,6 @@ These tools can be dynamically enabled or extended via LangChain Tool APIs.
 9. **Administrator Account**
     The administrator account is `administrator` with the email `your-configuration-APP_ADMIN_EMAIL-in-env-file` and the password is the one generated during the database seeding. You can find the password in the logs of the application.
 
----
 
 ## 🔌 API Endpoints
 
@@ -216,7 +209,6 @@ These tools can be dynamically enabled or extended via LangChain Tool APIs.
 
 > **Note:** Most endpoints require authentication via Yang Basic authentication. Include the token in the `x-yang-auth` header: `Basic <your-api-auth-key>`
 
----
 
 ## 🔧 Configuration
 
@@ -228,7 +220,6 @@ The service uses PostgreSQL with async SQLAlchemy. Database credentials should b
 
 Tools are managed through the database and can be enabled/disabled dynamically.
 
----
 
 ## 🚀 Usage Example
 
@@ -269,23 +260,14 @@ curl -X POST "http://localhost:8000/v1/chat/llm/completions" \
   }'
 ```
 
----
-
 ## 📝 License
 
 See [LICENSE](LICENSE) file for details.
-
----
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
----
+## Support
 
-## 📧 Contact
-
-For questions or support, please contact: administrator@yang.app
-
----
-
+For issues, questions, or contributions, please open an issue on the GitHub repository.
