@@ -25,24 +25,12 @@ class AWSConfig(object):
     
     aws_secret_name: str = os.getenv("AWS_SECRET_NAME", "")
 
-    bedrock_model_claude_text_id: str = os.getenv("BEDROCK_MODEL_CLAUDE_TEXT_ID", "")
-    bedrock_model_claude_text_max_tokens: str = os.getenv("BEDROCK_MODEL_CLAUDE_TEXT_MAX_TOKENS", "2048")
-    bedrock_model_claude_text_temperature: str = os.getenv("BEDROCK_MODEL_CLAUDE_TEXT_TEMPERATURE", "0.7")
-
-    bedkrock_model_claude_vision_id: str = os.getenv("BEDROCK_MODEL_CLAUDE_VISION_ID", "")
-    bedrock_model_claude_vision_max_tokens: str = os.getenv("BEDROCK_MODEL_CLAUDE_VISION_MAX_TOKENS", "2048")
-    bedrock_model_claude_vision_temperature: str = os.getenv("BEDROCK_MODEL_CLAUDE_VISION_TEMPERATURE", "0.7")
-
-    bedrock_knowledge_base_id: str = os.getenv("BEDROCK_KNOWLEDGE_BASE_ID", "")
-    bedrock_guardrail_id: str = os.getenv("BEDROCK_GUARDRAIL_ID", "")
-    bedrock_guardrail_version: str = os.getenv("BEDROCK_GUARDRAIL_VERSION", "")
 
 @dataclass
 class DatabaseConfig(object):
     """Database configuration class."""
 
-    db_enable: str = os.getenv("DB_ENABLE", "disable")
-    db_name: str = os.getenv("DB_NAME", "yang_genai")
+    db_name: str = os.getenv("DB_NAME", "yang_genai_db")
     db_host: str = os.getenv("DB_HOST", "localhost")
     db_port: str = os.getenv("DB_PORT", "5432")
     db_username_key: str = os.getenv("DB_USERNAME_KEY", "")

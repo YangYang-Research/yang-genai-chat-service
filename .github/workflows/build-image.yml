@@ -1,0 +1,217 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-release-version:
+    name: Check for "Release:" in commit message
+    runs-on: ubuntu-latest
+    outputs:
+      has_release: ${{ steps.check.outputs.has_release }}
+      release_version: ${{ steps.check.outputs.release_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Check commit message and extract version
+        id: check
+        run: |
+          echo "🔍 Checking last commit message..."
+
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "📝 Commit message: $COMMIT_MSG"
+
+          if echo "$COMMIT_MSG" | grep -q "Release:"; then
+            echo "✅ Found 'Release:' in commit message."
+            
+            # Extract version after "Release:" (handles formats like "Release: 1.2.3" or "Release:1.2.3")
+            RELEASE_VERSION=$(echo "$COMMIT_MSG" | grep -oP "(?i)Release:\s*\K[\d.]+" | head -1)
+            
+            if [ -z "$RELEASE_VERSION" ]; then
+              echo "⚠️  Warning: 'Release:' found but no version detected. Using commit SHA as version."
+              RELEASE_VERSION=$(git rev-parse --short HEAD)
+            else
+              echo "📦 Extracted release version: $RELEASE_VERSION"
+            fi
+            
+            echo "has_release=true" >> $GITHUB_OUTPUT
+            echo "release_version=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "ℹ️  No 'Release:' found. Will build with 'latest' tag only."
+            echo "has_release=false" >> $GITHUB_OUTPUT
+            echo "release_version=" >> $GITHUB_OUTPUT
+          fi
+          
+  build-and-publish-to-container-registry:
+    name: Build and Publish Docker Images to Container Registry
+    needs:
+      - check-release-version
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: yang-genai-chat-service
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: us-east-1
+
+      - name: Log in to Amazon ECR Public
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry-type: public
+          mask-password: true
+
+      - name: Verify ECR login
+        run: |
+          if docker info | grep -q "public.ecr.aws"; then
+            echo "✅ ECR Public login verified"
+          else
+            echo "⚠️  Warning: ECR Public login may not be active"
+          fi
+
+      - name: Log in to GitHub Container Registry
+        env:
+          GH_ACTION_CR: ${{ secrets.GH_ACTION_CR }}
+        run: |
+          REPO_OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "$GH_ACTION_CR" | docker login ghcr.io -u "$REPO_OWNER_LOWER" --password-stdin
+
+      - name: Check if image version exists
+        id: check
+        env:
+          IMAGE_NAME: public.ecr.aws/x7l7e7v1/${{ matrix.name }}
+          RELEASE_VERSION: ${{ needs.check-release-version.outputs.release_version }}
+          HAS_RELEASE: ${{ needs.check-release-version.outputs.has_release }}
+        run: |
+          if [ "$HAS_RELEASE" == "true" ] && [ -n "$RELEASE_VERSION" ]; then
+            echo "🔍 Checking image: $IMAGE_NAME:$RELEASE_VERSION"
+            if docker manifest inspect "$IMAGE_NAME:$RELEASE_VERSION" > /dev/null 2>&1; then
+              echo "⏩ Image $IMAGE_NAME:$RELEASE_VERSION already exists. Skipping build."
+              echo "skip_build=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "✅ Image does not exist. Will proceed with build."
+              echo "skip_build=false" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "ℹ️  No release version specified. Will proceed with build (latest tag only)."
+            echo "skip_build=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Publish Multi-Arch Docker Image
+        if: steps.check.outputs.skip_build == 'false'
+        id: build
+        env:
+          IMAGE_NAME: public.ecr.aws/x7l7e7v1/${{ matrix.name }}
+          RELEASE_VERSION: ${{ needs.check-release-version.outputs.release_version }}
+          HAS_RELEASE: ${{ needs.check-release-version.outputs.has_release }}
+        run: |
+          # Convert repository owner to lowercase for Docker image name
+          REPO_OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          GHCR_IMAGE_NAME="ghcr.io/${REPO_OWNER_LOWER}/${{ matrix.name }}"
+          
+          echo "🔧 Building multi-arch image for linux/amd64,linux/arm64"
+          
+          # Build and push to GHCR first (primary registry)
+          GHCR_SUCCESS=false
+          echo "📦 Building and pushing to GHCR: $GHCR_IMAGE_NAME"
+          if [ "$HAS_RELEASE" == "true" ] && [ -n "$RELEASE_VERSION" ]; then
+            echo "📦 Tagging with version: $RELEASE_VERSION and latest"
+            if docker buildx build \
+              --platform linux/amd64,linux/arm64 \
+              --push \
+              -t "$GHCR_IMAGE_NAME:$RELEASE_VERSION" \
+              -t "$GHCR_IMAGE_NAME:latest" \
+              .; then
+              GHCR_SUCCESS=true
+              echo "✅ Successfully pushed to GHCR"
+            else
+              echo "❌ Failed to push to GHCR"
+              exit 1
+            fi
+          else
+            echo "📦 Tagging with: latest only"
+            if docker buildx build \
+              --platform linux/amd64,linux/arm64 \
+              --push \
+              -t "$GHCR_IMAGE_NAME:latest" \
+              .; then
+              GHCR_SUCCESS=true
+              echo "✅ Successfully pushed to GHCR"
+            else
+              echo "❌ Failed to push to GHCR"
+              exit 1
+            fi
+          fi
+          
+          # Try to push to ECR Public (secondary registry - failures are non-fatal)
+          ECR_SUCCESS=false
+          echo "📦 Attempting to push to ECR: $IMAGE_NAME"
+          if [ "$HAS_RELEASE" == "true" ] && [ -n "$RELEASE_VERSION" ]; then
+            if docker buildx build \
+              --platform linux/amd64,linux/arm64 \
+              --push \
+              -t "$IMAGE_NAME:$RELEASE_VERSION" \
+              -t "$IMAGE_NAME:latest" \
+              . 2>&1; then
+              ECR_SUCCESS=true
+              echo "✅ Successfully pushed to ECR"
+            else
+              ECR_EXIT_CODE=$?
+              echo "⚠️  Failed to push to ECR (exit code: $ECR_EXIT_CODE)"
+              echo "⚠️  This may be due to:"
+              echo "   - Missing IAM permissions for ECR Public"
+              echo "   - Repository not existing in ECR Public namespace"
+              echo "   - Authentication issues"
+              echo "⚠️  Continuing as GHCR push succeeded..."
+            fi
+          else
+            if docker buildx build \
+              --platform linux/amd64,linux/arm64 \
+              --push \
+              -t "$IMAGE_NAME:latest" \
+              . 2>&1; then
+              ECR_SUCCESS=true
+              echo "✅ Successfully pushed to ECR"
+            else
+              ECR_EXIT_CODE=$?
+              echo "⚠️  Failed to push to ECR (exit code: $ECR_EXIT_CODE)"
+              echo "⚠️  This may be due to:"
+              echo "   - Missing IAM permissions for ECR Public"
+              echo "   - Repository not existing in ECR Public namespace"
+              echo "   - Authentication issues"
+              echo "⚠️  Continuing as GHCR push succeeded..."
+            fi
+          fi
+          
+          # Summary
+          if [ "$ECR_SUCCESS" == "true" ] && [ "$GHCR_SUCCESS" == "true" ]; then
+            echo "✅ Build and push completed successfully for both registries"
+            echo "build_success=true" >> "$GITHUB_OUTPUT"
+          elif [ "$GHCR_SUCCESS" == "true" ]; then
+            echo "✅ Build completed successfully (GHCR push succeeded, ECR push failed but non-fatal)"
+            echo "build_success=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "❌ Build failed - GHCR push failed"
+            exit 1
+          fi
+
+                

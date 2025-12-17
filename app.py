@@ -31,29 +31,25 @@ SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
-        if db_conf.db_enable == "enable":
-            try:
-                await create_database_if_not_exists()
-                async with engine.begin() as conn:
-                    await conn.run_sync(db_models.Base.metadata.create_all)
-                logger.info("✅ Tables synchronized with models.")
+        try:
+            await create_database_if_not_exists()
+            async with engine.begin() as conn:
+                await conn.run_sync(db_models.Base.metadata.create_all)
+            logger.info("✅ Tables synchronized with models.")
 
-                # --- Seeding initial data ---
-                async with SessionLocal() as session:
-                    await seed_initial_data(session)
-                logger.info("🌱 Database seeding completed successfully.")
-            except Exception as e:
-                logger.error(f"❌ Database initialization failed: {e}")
-        else:
-            logger.warning("⚠️ Database initialization skipped.")
+            # --- Seeding initial data ---
+            async with SessionLocal() as session:
+                await seed_initial_data(session)
+            logger.info("🌱 Database seeding completed successfully.")
+        except Exception as e:
+            logger.error(f"❌ Database initialization failed: {e}")
 
         yield  # <-- always yield, even if startup fails
 
     finally:
         try:
-            if db_conf.db_enable == "enable":
-                await engine.dispose()
-                logger.info("🧹 Database connection closed.")
+            await engine.dispose()
+            logger.info("🧹 Database connection closed.")
         except Exception as e:
             logger.error(f"⚠️ Error during shutdown cleanup: {e} \n TRACEBACK: ", traceback.format_exc())
         
